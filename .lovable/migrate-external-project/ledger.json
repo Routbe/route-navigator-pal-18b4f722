@@ -1,0 +1,19 @@
+{
+  "source": "github:Routbe/route-navigator-pal (ROUT — rout.be)",
+  "capabilities": [
+    { "capability": "application_code", "source": "src/ (820 TS/TSX files, TanStack Start)", "outcome": "migrate", "status": "in_progress", "next_action": "copy into project, install deps, build" },
+    { "capability": "database_schema", "source": "db/00-53 SQL migrations (Neon Postgres)", "outcome": "migrate", "status": "pending", "next_action": "apply to Lovable Cloud Postgres" },
+    { "capability": "database_records", "source": "none attached", "outcome": "migrate", "status": "pending", "next_action": "request CSV/JSON exports from Neon dashboard after preview" },
+    { "capability": "auth_identities", "source": "better-auth (Google/GitHub/GitLab/Apple/Infomaniak OAuth, passkeys, email)", "outcome": "migrate", "status": "pending", "next_action": "map to Lovable Cloud auth; user export pending" },
+    { "capability": "authorization", "source": "roles/admin permissions in db migrations", "outcome": "migrate", "status": "pending", "next_action": "recreate with RLS after schema import" },
+    { "capability": "payments", "source": "Stripe (+ Stripe Connect), bunq, gift cards", "outcome": "preserve", "status": "pending", "next_action": "keep providers; request keys via secure secret form at verification" },
+    { "capability": "email", "source": "Brevo templates (docs/brevo-templates.md)", "outcome": "preserve", "status": "pending", "next_action": "keep provider; request API key at verification" },
+    { "capability": "storage", "source": "avatar objects, shared files, gallery media", "outcome": "migrate", "status": "pending", "next_action": "recreate buckets in Lovable Cloud storage" },
+    { "capability": "public_endpoints", "source": "src/routes/api.* (oauth, badges, well-known, health)", "outcome": "migrate", "status": "in_progress", "next_action": "comes with code copy" },
+    { "capability": "cron", "source": "api_.public.cron.* (check-dns, purge, sync, billing)", "outcome": "migrate", "status": "pending", "next_action": "recreate schedules after deploy" },
+    { "capability": "oauth_callbacks", "source": "Bluesky/Mastodon/bunq/Stripe Connect callbacks", "outcome": "preserve", "status": "pending", "next_action": "update callback URLs at cutover" },
+    { "capability": "secrets", "source": "ENVIRONMENT.md list (DATABASE_URL, BETTER_AUTH_SECRET, OAuth keys, ...)", "outcome": "migrate", "status": "pending", "next_action": "request values via secure secret form before verification" },
+    { "capability": "cutover", "source": "rout.be domain on Vercel", "outcome": "pending", "status": "pending", "next_action": "domain connect after verification" },
+    { "capability": "verification", "source": "-", "outcome": "pending", "status": "pending", "next_action": "build + route smoke tests after code copy" }
+  ]
+}
