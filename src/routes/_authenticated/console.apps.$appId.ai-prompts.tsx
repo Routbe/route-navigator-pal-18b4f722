@@ -18,7 +18,7 @@ const STACKS: { id: Stack; label: string }[] = [
   { id: "nextjs", label: "Next.js" }, { id: "tanstack", label: "TanStack Start" }, { id: "express", label: "Express" }, { id: "other", label: "Andere" },
 ];
 
-function Pills<T extends string>({ items, value, onChange }: { items: { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
+function Pills<T extends string>({ items, value, onChange }: { items: readonly { id: T; label: string }[]; value: T; onChange: (v: T) => void }) {
   return (
     <div className="flex flex-wrap gap-2">
       {items.map((i) => (
@@ -40,8 +40,8 @@ function AiPromptsPage() {
     <ConsolePage title="AI-prompts" description="Plak deze prompt in je AI-assistent. Je client_id, Discovery URL, scopes en Superpowers zitten er al in — je geheim nooit.">
       <ConsoleCard>
         <div className="space-y-4">
-          <div><p className="mb-2 text-sm font-medium">Assistent</p><Pills items={TOOLS} value={tool} onChange={setTool} /></div>
-          <div><p className="mb-2 text-sm font-medium">Stack</p><Pills items={STACKS} value={stack} onChange={setStack} /></div>
+          <div><p className="mb-2 text-sm font-medium">Assistent</p><Pills<AiTool> items={TOOLS} value={tool} onChange={setTool} /></div>
+          <div><p className="mb-2 text-sm font-medium">Stack</p><Pills<Stack> items={STACKS} value={stack} onChange={setStack} /></div>
         </div>
       </ConsoleCard>
       <CodeBlock label={`prompt · ${tool} · ${stack}`} code={buildAiPrompt(app, tool, stack)} />
