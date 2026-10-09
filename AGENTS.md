@@ -33,3 +33,4 @@
 
 - Page share images are drawn in code (`src/lib/page-og.server.ts`) from the single logo source `src/lib/brand/logo.ts`, one per page per locale at `/brand/og/<page>-<locale>.png`, cached in the internal bucket under a version prefix; never AI-generated, never rotated. Why: brand fidelity and crawler-cache stability.
 - Bot checks run only through the self-hosted ALTCHA proof-of-work (`altcha.server.ts`, single-use via `altcha_used` db/54); `api_/auth/$.ts` refuses email sign-up/sign-in/magic-link/password-reset with `altcha_invalid` (400) before Better Auth runs. Why: no third-party bot service and no tracking.
+- The Live Auth debugger (`oauth_debug_events`, db/56) is written only via `logOAuthEvent()` in `debug-events.server.ts`, which strips query strings and never stores IPs, user ids, tokens or codes. Why: debug data is developer-facing and must stay PII-free.

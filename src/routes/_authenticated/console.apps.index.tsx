@@ -1,20 +1,18 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, ShieldCheck, Zap, Copy } from "lucide-react";
+import { Plus, Trash2, ShieldCheck, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { ConsolePage } from "@/components/console/ConsolePage";
 import { APPS_KEY, errorText, useConsoleApps, type ConsoleApp } from "@/components/console/console-data";
 import { AppLogo } from "@/components/console/AppLogo";
-import { deleteOAuthClient, saveOAuthClient } from "@/lib/oauth/console.functions";
+import { deleteOAuthClient } from "@/lib/oauth/console.functions";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/console/apps/")({
   component: AppsOverview,
@@ -22,7 +20,6 @@ export const Route = createFileRoute("/_authenticated/console/apps/")({
 
 function AppsOverview() {
   const { data, isLoading, error } = useConsoleApps();
-  const [creating, setCreating] = useState(false);
   const [toDelete, setToDelete] = useState<ConsoleApp | null>(null);
   const remove = useServerFn(deleteOAuthClient);
   const qc = useQueryClient();
@@ -31,7 +28,7 @@ function AppsOverview() {
     <ConsolePage
       title="Je apps"
       description="Alle apps die 'Login met ROUT' gebruiken."
-      actions={<Button onClick={() => setCreating(true)}><Plus className="h-4 w-4" /> Nieuwe app</Button>}
+      actions={<Button asChild><Link to="/console/apps/new"><Plus className="h-4 w-4" /> Nieuwe app</Link></Button>}
     >
       {isLoading && <p className="text-sm text-muted-foreground">Apps laden…</p>}
       {error && <p className="text-sm text-destructive">{errorText(error, "Apps konden niet geladen worden.")}</p>}
@@ -73,7 +70,6 @@ function AppsOverview() {
         </div>
       )}
 
-      <CreateAppDialog open={creating} onOpenChange={setCreating} />
 
       <AlertDialog open={!!toDelete} onOpenChange={(o) => !o && setToDelete(null)}>
         <AlertDialogContent>
@@ -104,67 +100,5 @@ function AppsOverview() {
         </AlertDialogContent>
       </AlertDialog>
     </ConsolePage>
-  );
-}
-
-function CreateAppDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
-  const save = useServerFn(saveOAuthClient);
-  const qc = useQueryClient();
-  const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [redirect, setRedirect] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [secret, setSecret] = useState<{ appId: string; secret: string } | null>(null);
-
-  const close = () => {
-    onOpenChange(false);
-    setName(""); setRedirect(""); setSecret(null);
-  };
-
-  return (
-    <Dialog open={open} onOpenChange={(o) => (o ? onOpenChange(true) : close())}>
-      <DialogContent>
-        <DialogHeader><DialogTitle>{secret ? "Bewaar je client secret" : "Nieuwe app"}</DialogTitle></DialogHeader>
-        {secret ? (
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Dit geheim wordt maar één keer getoond.</p>
-            <div className="flex items-center gap-2 rounded-lg border border-border bg-muted p-3">
-              <code className="flex-1 break-all text-xs">{secret.secret}</code>
-              <button type="button" aria-label="Kopieer" onClick={() => { navigator.clipboard.writeText(secret.secret); toast.success("Gekopieerd"); }}>
-                <Copy className="h-4 w-4" />
-              </button>
-            </div>
-            <DialogFooter>
-              <Button onClick={() => { const id = secret.appId; close(); navigate({ to: "/console/apps/$appId/credentials", params: { appId: id } }); }}>
-                Naar de app
-              </Button>
-            </DialogFooter>
-          </div>
-        ) : (
-          <form
-            className="space-y-3"
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setBusy(true);
-              try {
-                const res = (await save({
-                  data: { name: name.trim(), redirectUris: [redirect.trim()], scopes: ["openid", "profile", "email"] },
-                })) as { client: { id: string }; clientSecret: string | null };
-                await qc.invalidateQueries({ queryKey: APPS_KEY });
-                setSecret({ appId: res.client.id, secret: res.clientSecret ?? "" });
-              } catch (err) {
-                toast.error(errorText(err, "Aanmaken mislukt."));
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <Input required maxLength={80} placeholder="Naam van je app" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input required type="url" placeholder="https://jouwapp.be/auth/callback" value={redirect} onChange={(e) => setRedirect(e.target.value)} />
-            <DialogFooter><Button type="submit" disabled={busy}>{busy ? "Bezig…" : "App aanmaken"}</Button></DialogFooter>
-          </form>
-        )}
-      </DialogContent>
-    </Dialog>
   );
 }
