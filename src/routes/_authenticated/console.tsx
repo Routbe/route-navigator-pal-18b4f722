@@ -3,6 +3,8 @@ import { createFileRoute, Link, Outlet, useParams } from "@tanstack/react-router
 import {
   ArrowLeft,
   Blocks,
+  Database,
+  Terminal,
   Bot,
   Gauge,
   KeyRound,
@@ -41,6 +43,9 @@ const APP_NAV = [
   { to: "/console/apps/$appId/scopes", label: "Scopes", icon: ListChecks },
   { to: "/console/apps/$appId/publishing", label: "Publishing", icon: Rocket },
   { to: "/console/apps/$appId/security", label: "Security", icon: ShieldCheck },
+  { to: "/console/apps/$appId/auth-logs", label: "Auth logs", icon: Terminal },
+  { to: "/console/apps/$appId/ai-prompts", label: "AI Prompts", icon: Bot },
+  { to: "/console/apps/$appId/schema", label: "Schema", icon: Database },
   { to: "/console/apps/$appId/advanced", label: "Advanced", icon: SlidersHorizontal },
 ] as const;
 

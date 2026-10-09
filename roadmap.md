@@ -15,3 +15,5 @@
 - [x] Dual-tier identiteit: root-handleclaim in profielinstellingen geblokkeerd voor gratis accounts
       (writeProfileSettings); subdomeinen en donaties waren al afgeschermd via assertEntitled
 - [x] Donatie-/steunpagina: al server-side afgesloten voor gratis accounts (readDonationTarget → null)
+- [x] Developer Console: 4-stappen wizard (draft in sessionStorage), AI-prompts, schema-templates,
+      live Auth-logs (db/56, zonder IP/PII, 7 dagen bewaard)
