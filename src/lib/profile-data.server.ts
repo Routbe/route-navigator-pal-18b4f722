@@ -91,6 +91,29 @@ export type ProfileSettingsInput = {
 };
 
 export async function writeProfileSettings(userId: string, input: ProfileSettingsInput) {
+  // Dual-tier identiteit: de rootnamespace (rout.be/<handle>) is exclusief voor
+  // betaalde/geverifieerde leden. Gratis accounts beheren hun naam uitsluitend
+  // via het aliasprofiel op /u/<handle> en kunnen hier nooit een roothandle
+  // claimen of wijzigen.
+  const current = (await sql`
+    select username from public.profiles where id = ${userId} limit 1
+  `) as Record<string, unknown>[];
+  const currentUsername = (current[0]?.["username"] as string | null) ?? null;
+  const requested = input.username ? input.username.toLowerCase() : null;
+  const unchanged = requested === (currentUsername?.toLowerCase() ?? null);
+
+  if (!unchanged) {
+    const { loadEntitlement } = await import("./entitlement.server");
+    const entitlement = await loadEntitlement(userId);
+    if (!entitlement.entitled) {
+      throw new Error("handle_requires_paid");
+    }
+    const { isHandleAvailableFor } = await import("./handle-namespace.server");
+    if (requested && !(await isHandleAvailableFor(requested, userId))) {
+      throw new Error("That handle is already taken.");
+    }
+  }
+
   try {
     await sql`
       update public.profiles
