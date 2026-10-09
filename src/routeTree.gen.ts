@@ -99,6 +99,7 @@ import { Route as UUsernameDonateRouteImport } from './routes/u.$username.donate
 import { Route as UUsernameTipRouteImport } from './routes/u.$username.tip'
 import { Route as AuthenticatedConsoleAppsIndexRouteImport } from './routes/_authenticated/console.apps.index'
 import { Route as AuthenticatedConsoleAppsAppIdRouteImport } from './routes/_authenticated/console.apps.$appId'
+import { Route as AuthenticatedConsoleAppsNewRouteImport } from './routes/_authenticated/console.apps.new'
 import { Route as ApiPublicAuthProvidersRouteImport } from './routes/api_.public.auth.providers'
 import { Route as ApiPublicBadgeHandleRouteImport } from './routes/api_.public.badge.$handle'
 import { Route as ApiPublicBlueskyCallbackRouteImport } from './routes/api_.public.bluesky.callback'
@@ -121,11 +122,14 @@ import { Route as ApiPublicSessionLogoutRouteImport } from './routes/api_.public
 import { Route as ApiPublicWebhooksBankingRouteImport } from './routes/api_.public.webhooks.banking'
 import { Route as AuthenticatedConsoleAppsAppIdIndexRouteImport } from './routes/_authenticated/console.apps.$appId.index'
 import { Route as AuthenticatedConsoleAppsAppIdAdvancedRouteImport } from './routes/_authenticated/console.apps.$appId.advanced'
+import { Route as AuthenticatedConsoleAppsAppIdAiPromptsRouteImport } from './routes/_authenticated/console.apps.$appId.ai-prompts'
+import { Route as AuthenticatedConsoleAppsAppIdAuthLogsRouteImport } from './routes/_authenticated/console.apps.$appId.auth-logs'
 import { Route as AuthenticatedConsoleAppsAppIdBrandingRouteImport } from './routes/_authenticated/console.apps.$appId.branding'
 import { Route as AuthenticatedConsoleAppsAppIdCredentialsRouteImport } from './routes/_authenticated/console.apps.$appId.credentials'
 import { Route as AuthenticatedConsoleAppsAppIdOverviewRouteImport } from './routes/_authenticated/console.apps.$appId.overview'
 import { Route as AuthenticatedConsoleAppsAppIdPublishingRouteImport } from './routes/_authenticated/console.apps.$appId.publishing'
 import { Route as AuthenticatedConsoleAppsAppIdRedirectsRouteImport } from './routes/_authenticated/console.apps.$appId.redirects'
+import { Route as AuthenticatedConsoleAppsAppIdSchemaRouteImport } from './routes/_authenticated/console.apps.$appId.schema'
 import { Route as AuthenticatedConsoleAppsAppIdScopesRouteImport } from './routes/_authenticated/console.apps.$appId.scopes'
 import { Route as AuthenticatedConsoleAppsAppIdSecurityRouteImport } from './routes/_authenticated/console.apps.$appId.security'
 import { Route as ApiPublicBookingsIdActionRouteImport } from './routes/api_.public.bookings.$id.$action'
@@ -595,6 +599,12 @@ const AuthenticatedConsoleAppsAppIdRoute =
     path: '/$appId',
     getParentRoute: () => AuthenticatedConsoleAppsRoute,
   } as any)
+const AuthenticatedConsoleAppsNewRoute =
+  AuthenticatedConsoleAppsNewRouteImport.update({
+    id: '/new',
+    path: '/new',
+    getParentRoute: () => AuthenticatedConsoleAppsRoute,
+  } as any)
 const ApiPublicAuthProvidersRoute = ApiPublicAuthProvidersRouteImport.update({
   id: '/api_/public/auth/providers',
   path: '/api/public/auth/providers',
@@ -717,6 +727,18 @@ const AuthenticatedConsoleAppsAppIdAdvancedRoute =
     path: '/advanced',
     getParentRoute: () => AuthenticatedConsoleAppsAppIdRoute,
   } as any)
+const AuthenticatedConsoleAppsAppIdAiPromptsRoute =
+  AuthenticatedConsoleAppsAppIdAiPromptsRouteImport.update({
+    id: '/ai-prompts',
+    path: '/ai-prompts',
+    getParentRoute: () => AuthenticatedConsoleAppsAppIdRoute,
+  } as any)
+const AuthenticatedConsoleAppsAppIdAuthLogsRoute =
+  AuthenticatedConsoleAppsAppIdAuthLogsRouteImport.update({
+    id: '/auth-logs',
+    path: '/auth-logs',
+    getParentRoute: () => AuthenticatedConsoleAppsAppIdRoute,
+  } as any)
 const AuthenticatedConsoleAppsAppIdBrandingRoute =
   AuthenticatedConsoleAppsAppIdBrandingRouteImport.update({
     id: '/branding',
@@ -745,6 +767,12 @@ const AuthenticatedConsoleAppsAppIdRedirectsRoute =
   AuthenticatedConsoleAppsAppIdRedirectsRouteImport.update({
     id: '/redirects',
     path: '/redirects',
+    getParentRoute: () => AuthenticatedConsoleAppsAppIdRoute,
+  } as any)
+const AuthenticatedConsoleAppsAppIdSchemaRoute =
+  AuthenticatedConsoleAppsAppIdSchemaRouteImport.update({
+    id: '/schema',
+    path: '/schema',
     getParentRoute: () => AuthenticatedConsoleAppsAppIdRoute,
   } as any)
 const AuthenticatedConsoleAppsAppIdScopesRoute =
@@ -855,6 +883,7 @@ export interface FileRoutesByFullPath {
   '/u/$username/tip': typeof UUsernameTipRoute
   '/console/': typeof AuthenticatedConsoleIndexRoute
   '/console/apps/$appId': typeof AuthenticatedConsoleAppsAppIdRouteWithChildren
+  '/console/apps/new': typeof AuthenticatedConsoleAppsNewRoute
   '/api/public/auth/providers': typeof ApiPublicAuthProvidersRoute
   '/api/public/badge/$handle': typeof ApiPublicBadgeHandleRoute
   '/api/public/bluesky/callback': typeof ApiPublicBlueskyCallbackRoute
@@ -877,11 +906,14 @@ export interface FileRoutesByFullPath {
   '/api/public/webhooks/banking': typeof ApiPublicWebhooksBankingRoute
   '/console/apps/': typeof AuthenticatedConsoleAppsIndexRoute
   '/console/apps/$appId/advanced': typeof AuthenticatedConsoleAppsAppIdAdvancedRoute
+  '/console/apps/$appId/ai-prompts': typeof AuthenticatedConsoleAppsAppIdAiPromptsRoute
+  '/console/apps/$appId/auth-logs': typeof AuthenticatedConsoleAppsAppIdAuthLogsRoute
   '/console/apps/$appId/branding': typeof AuthenticatedConsoleAppsAppIdBrandingRoute
   '/console/apps/$appId/credentials': typeof AuthenticatedConsoleAppsAppIdCredentialsRoute
   '/console/apps/$appId/overview': typeof AuthenticatedConsoleAppsAppIdOverviewRoute
   '/console/apps/$appId/publishing': typeof AuthenticatedConsoleAppsAppIdPublishingRoute
   '/console/apps/$appId/redirects': typeof AuthenticatedConsoleAppsAppIdRedirectsRoute
+  '/console/apps/$appId/schema': typeof AuthenticatedConsoleAppsAppIdSchemaRoute
   '/console/apps/$appId/scopes': typeof AuthenticatedConsoleAppsAppIdScopesRoute
   '/console/apps/$appId/security': typeof AuthenticatedConsoleAppsAppIdSecurityRoute
   '/api/public/bookings/$id/$action': typeof ApiPublicBookingsIdActionRoute
@@ -972,6 +1004,7 @@ export interface FileRoutesByTo {
   '/u/$username/donate': typeof UUsernameDonateRoute
   '/u/$username/tip': typeof UUsernameTipRoute
   '/console': typeof AuthenticatedConsoleIndexRoute
+  '/console/apps/new': typeof AuthenticatedConsoleAppsNewRoute
   '/api/public/auth/providers': typeof ApiPublicAuthProvidersRoute
   '/api/public/badge/$handle': typeof ApiPublicBadgeHandleRoute
   '/api/public/bluesky/callback': typeof ApiPublicBlueskyCallbackRoute
@@ -994,11 +1027,14 @@ export interface FileRoutesByTo {
   '/api/public/webhooks/banking': typeof ApiPublicWebhooksBankingRoute
   '/console/apps': typeof AuthenticatedConsoleAppsIndexRoute
   '/console/apps/$appId/advanced': typeof AuthenticatedConsoleAppsAppIdAdvancedRoute
+  '/console/apps/$appId/ai-prompts': typeof AuthenticatedConsoleAppsAppIdAiPromptsRoute
+  '/console/apps/$appId/auth-logs': typeof AuthenticatedConsoleAppsAppIdAuthLogsRoute
   '/console/apps/$appId/branding': typeof AuthenticatedConsoleAppsAppIdBrandingRoute
   '/console/apps/$appId/credentials': typeof AuthenticatedConsoleAppsAppIdCredentialsRoute
   '/console/apps/$appId/overview': typeof AuthenticatedConsoleAppsAppIdOverviewRoute
   '/console/apps/$appId/publishing': typeof AuthenticatedConsoleAppsAppIdPublishingRoute
   '/console/apps/$appId/redirects': typeof AuthenticatedConsoleAppsAppIdRedirectsRoute
+  '/console/apps/$appId/schema': typeof AuthenticatedConsoleAppsAppIdSchemaRoute
   '/console/apps/$appId/scopes': typeof AuthenticatedConsoleAppsAppIdScopesRoute
   '/console/apps/$appId/security': typeof AuthenticatedConsoleAppsAppIdSecurityRoute
   '/api/public/bookings/$id/$action': typeof ApiPublicBookingsIdActionRoute
@@ -1095,6 +1131,7 @@ export interface FileRoutesById {
   '/u/$username/tip': typeof UUsernameTipRoute
   '/_authenticated/console/': typeof AuthenticatedConsoleIndexRoute
   '/_authenticated/console/apps/$appId': typeof AuthenticatedConsoleAppsAppIdRouteWithChildren
+  '/_authenticated/console/apps/new': typeof AuthenticatedConsoleAppsNewRoute
   '/api_/public/auth/providers': typeof ApiPublicAuthProvidersRoute
   '/api_/public/badge/$handle': typeof ApiPublicBadgeHandleRoute
   '/api_/public/bluesky/callback': typeof ApiPublicBlueskyCallbackRoute
@@ -1117,11 +1154,14 @@ export interface FileRoutesById {
   '/api_/public/webhooks/banking': typeof ApiPublicWebhooksBankingRoute
   '/_authenticated/console/apps/': typeof AuthenticatedConsoleAppsIndexRoute
   '/_authenticated/console/apps/$appId/advanced': typeof AuthenticatedConsoleAppsAppIdAdvancedRoute
+  '/_authenticated/console/apps/$appId/ai-prompts': typeof AuthenticatedConsoleAppsAppIdAiPromptsRoute
+  '/_authenticated/console/apps/$appId/auth-logs': typeof AuthenticatedConsoleAppsAppIdAuthLogsRoute
   '/_authenticated/console/apps/$appId/branding': typeof AuthenticatedConsoleAppsAppIdBrandingRoute
   '/_authenticated/console/apps/$appId/credentials': typeof AuthenticatedConsoleAppsAppIdCredentialsRoute
   '/_authenticated/console/apps/$appId/overview': typeof AuthenticatedConsoleAppsAppIdOverviewRoute
   '/_authenticated/console/apps/$appId/publishing': typeof AuthenticatedConsoleAppsAppIdPublishingRoute
   '/_authenticated/console/apps/$appId/redirects': typeof AuthenticatedConsoleAppsAppIdRedirectsRoute
+  '/_authenticated/console/apps/$appId/schema': typeof AuthenticatedConsoleAppsAppIdSchemaRoute
   '/_authenticated/console/apps/$appId/scopes': typeof AuthenticatedConsoleAppsAppIdScopesRoute
   '/_authenticated/console/apps/$appId/security': typeof AuthenticatedConsoleAppsAppIdSecurityRoute
   '/api_/public/bookings/$id/$action': typeof ApiPublicBookingsIdActionRoute
@@ -1218,6 +1258,7 @@ export interface FileRouteTypes {
     | '/u/$username/tip'
     | '/console/'
     | '/console/apps/$appId'
+    | '/console/apps/new'
     | '/api/public/auth/providers'
     | '/api/public/badge/$handle'
     | '/api/public/bluesky/callback'
@@ -1240,11 +1281,14 @@ export interface FileRouteTypes {
     | '/api/public/webhooks/banking'
     | '/console/apps/'
     | '/console/apps/$appId/advanced'
+    | '/console/apps/$appId/ai-prompts'
+    | '/console/apps/$appId/auth-logs'
     | '/console/apps/$appId/branding'
     | '/console/apps/$appId/credentials'
     | '/console/apps/$appId/overview'
     | '/console/apps/$appId/publishing'
     | '/console/apps/$appId/redirects'
+    | '/console/apps/$appId/schema'
     | '/console/apps/$appId/scopes'
     | '/console/apps/$appId/security'
     | '/api/public/bookings/$id/$action'
@@ -1335,6 +1379,7 @@ export interface FileRouteTypes {
     | '/u/$username/donate'
     | '/u/$username/tip'
     | '/console'
+    | '/console/apps/new'
     | '/api/public/auth/providers'
     | '/api/public/badge/$handle'
     | '/api/public/bluesky/callback'
@@ -1357,11 +1402,14 @@ export interface FileRouteTypes {
     | '/api/public/webhooks/banking'
     | '/console/apps'
     | '/console/apps/$appId/advanced'
+    | '/console/apps/$appId/ai-prompts'
+    | '/console/apps/$appId/auth-logs'
     | '/console/apps/$appId/branding'
     | '/console/apps/$appId/credentials'
     | '/console/apps/$appId/overview'
     | '/console/apps/$appId/publishing'
     | '/console/apps/$appId/redirects'
+    | '/console/apps/$appId/schema'
     | '/console/apps/$appId/scopes'
     | '/console/apps/$appId/security'
     | '/api/public/bookings/$id/$action'
@@ -1457,6 +1505,7 @@ export interface FileRouteTypes {
     | '/u/$username/tip'
     | '/_authenticated/console/'
     | '/_authenticated/console/apps/$appId'
+    | '/_authenticated/console/apps/new'
     | '/api_/public/auth/providers'
     | '/api_/public/badge/$handle'
     | '/api_/public/bluesky/callback'
@@ -1479,11 +1528,14 @@ export interface FileRouteTypes {
     | '/api_/public/webhooks/banking'
     | '/_authenticated/console/apps/'
     | '/_authenticated/console/apps/$appId/advanced'
+    | '/_authenticated/console/apps/$appId/ai-prompts'
+    | '/_authenticated/console/apps/$appId/auth-logs'
     | '/_authenticated/console/apps/$appId/branding'
     | '/_authenticated/console/apps/$appId/credentials'
     | '/_authenticated/console/apps/$appId/overview'
     | '/_authenticated/console/apps/$appId/publishing'
     | '/_authenticated/console/apps/$appId/redirects'
+    | '/_authenticated/console/apps/$appId/schema'
     | '/_authenticated/console/apps/$appId/scopes'
     | '/_authenticated/console/apps/$appId/security'
     | '/api_/public/bookings/$id/$action'
@@ -2202,6 +2254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleAppsAppIdRouteImport
       parentRoute: typeof AuthenticatedConsoleAppsRoute
     }
+    '/_authenticated/console/apps/new': {
+      id: '/_authenticated/console/apps/new'
+      path: '/new'
+      fullPath: '/console/apps/new'
+      preLoaderRoute: typeof AuthenticatedConsoleAppsNewRouteImport
+      parentRoute: typeof AuthenticatedConsoleAppsRoute
+    }
     '/api_/public/auth/providers': {
       id: '/api_/public/auth/providers'
       path: '/api/public/auth/providers'
@@ -2356,6 +2415,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConsoleAppsAppIdAdvancedRouteImport
       parentRoute: typeof AuthenticatedConsoleAppsAppIdRoute
     }
+    '/_authenticated/console/apps/$appId/ai-prompts': {
+      id: '/_authenticated/console/apps/$appId/ai-prompts'
+      path: '/ai-prompts'
+      fullPath: '/console/apps/$appId/ai-prompts'
+      preLoaderRoute: typeof AuthenticatedConsoleAppsAppIdAiPromptsRouteImport
+      parentRoute: typeof AuthenticatedConsoleAppsAppIdRoute
+    }
+    '/_authenticated/console/apps/$appId/auth-logs': {
+      id: '/_authenticated/console/apps/$appId/auth-logs'
+      path: '/auth-logs'
+      fullPath: '/console/apps/$appId/auth-logs'
+      preLoaderRoute: typeof AuthenticatedConsoleAppsAppIdAuthLogsRouteImport
+      parentRoute: typeof AuthenticatedConsoleAppsAppIdRoute
+    }
     '/_authenticated/console/apps/$appId/branding': {
       id: '/_authenticated/console/apps/$appId/branding'
       path: '/branding'
@@ -2389,6 +2462,13 @@ declare module '@tanstack/react-router' {
       path: '/redirects'
       fullPath: '/console/apps/$appId/redirects'
       preLoaderRoute: typeof AuthenticatedConsoleAppsAppIdRedirectsRouteImport
+      parentRoute: typeof AuthenticatedConsoleAppsAppIdRoute
+    }
+    '/_authenticated/console/apps/$appId/schema': {
+      id: '/_authenticated/console/apps/$appId/schema'
+      path: '/schema'
+      fullPath: '/console/apps/$appId/schema'
+      preLoaderRoute: typeof AuthenticatedConsoleAppsAppIdSchemaRouteImport
       parentRoute: typeof AuthenticatedConsoleAppsAppIdRoute
     }
     '/_authenticated/console/apps/$appId/scopes': {
@@ -2456,11 +2536,14 @@ const AuthenticatedAdminRouteWithChildren =
 
 interface AuthenticatedConsoleAppsAppIdRouteChildren {
   AuthenticatedConsoleAppsAppIdAdvancedRoute: typeof AuthenticatedConsoleAppsAppIdAdvancedRoute
+  AuthenticatedConsoleAppsAppIdAiPromptsRoute: typeof AuthenticatedConsoleAppsAppIdAiPromptsRoute
+  AuthenticatedConsoleAppsAppIdAuthLogsRoute: typeof AuthenticatedConsoleAppsAppIdAuthLogsRoute
   AuthenticatedConsoleAppsAppIdBrandingRoute: typeof AuthenticatedConsoleAppsAppIdBrandingRoute
   AuthenticatedConsoleAppsAppIdCredentialsRoute: typeof AuthenticatedConsoleAppsAppIdCredentialsRoute
   AuthenticatedConsoleAppsAppIdOverviewRoute: typeof AuthenticatedConsoleAppsAppIdOverviewRoute
   AuthenticatedConsoleAppsAppIdPublishingRoute: typeof AuthenticatedConsoleAppsAppIdPublishingRoute
   AuthenticatedConsoleAppsAppIdRedirectsRoute: typeof AuthenticatedConsoleAppsAppIdRedirectsRoute
+  AuthenticatedConsoleAppsAppIdSchemaRoute: typeof AuthenticatedConsoleAppsAppIdSchemaRoute
   AuthenticatedConsoleAppsAppIdScopesRoute: typeof AuthenticatedConsoleAppsAppIdScopesRoute
   AuthenticatedConsoleAppsAppIdSecurityRoute: typeof AuthenticatedConsoleAppsAppIdSecurityRoute
   AuthenticatedConsoleAppsAppIdIndexRoute: typeof AuthenticatedConsoleAppsAppIdIndexRoute
@@ -2470,6 +2553,10 @@ const AuthenticatedConsoleAppsAppIdRouteChildren: AuthenticatedConsoleAppsAppIdR
   {
     AuthenticatedConsoleAppsAppIdAdvancedRoute:
       AuthenticatedConsoleAppsAppIdAdvancedRoute,
+    AuthenticatedConsoleAppsAppIdAiPromptsRoute:
+      AuthenticatedConsoleAppsAppIdAiPromptsRoute,
+    AuthenticatedConsoleAppsAppIdAuthLogsRoute:
+      AuthenticatedConsoleAppsAppIdAuthLogsRoute,
     AuthenticatedConsoleAppsAppIdBrandingRoute:
       AuthenticatedConsoleAppsAppIdBrandingRoute,
     AuthenticatedConsoleAppsAppIdCredentialsRoute:
@@ -2480,6 +2567,8 @@ const AuthenticatedConsoleAppsAppIdRouteChildren: AuthenticatedConsoleAppsAppIdR
       AuthenticatedConsoleAppsAppIdPublishingRoute,
     AuthenticatedConsoleAppsAppIdRedirectsRoute:
       AuthenticatedConsoleAppsAppIdRedirectsRoute,
+    AuthenticatedConsoleAppsAppIdSchemaRoute:
+      AuthenticatedConsoleAppsAppIdSchemaRoute,
     AuthenticatedConsoleAppsAppIdScopesRoute:
       AuthenticatedConsoleAppsAppIdScopesRoute,
     AuthenticatedConsoleAppsAppIdSecurityRoute:
@@ -2495,6 +2584,7 @@ const AuthenticatedConsoleAppsAppIdRouteWithChildren =
 
 interface AuthenticatedConsoleAppsRouteChildren {
   AuthenticatedConsoleAppsAppIdRoute: typeof AuthenticatedConsoleAppsAppIdRouteWithChildren
+  AuthenticatedConsoleAppsNewRoute: typeof AuthenticatedConsoleAppsNewRoute
   AuthenticatedConsoleAppsIndexRoute: typeof AuthenticatedConsoleAppsIndexRoute
 }
 
@@ -2502,6 +2592,7 @@ const AuthenticatedConsoleAppsRouteChildren: AuthenticatedConsoleAppsRouteChildr
   {
     AuthenticatedConsoleAppsAppIdRoute:
       AuthenticatedConsoleAppsAppIdRouteWithChildren,
+    AuthenticatedConsoleAppsNewRoute: AuthenticatedConsoleAppsNewRoute,
     AuthenticatedConsoleAppsIndexRoute: AuthenticatedConsoleAppsIndexRoute,
   }
 
