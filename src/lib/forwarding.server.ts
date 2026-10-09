@@ -66,6 +66,94 @@ async function sendConfirmationEmail(to: string, url: string): Promise<DeliveryR
   });
 }
 
+/**
+ * Rate limits voor bevestigingsmails ("limits are enough"): elk adres moet een
+ * bevestigingslink kunnen ontvangen, maar misbruik als spam-engine wordt
+ * rekenkundig onmogelijk gemaakt. Strikte backend-grenzen:
+ *   • max 3 mails per 10 minuten per account
+ *   • max 5 mails per dag per account
+ *   • max 2 mails per dag naar hetzelfde ontvangeradres
+ */
+const RATE_LIMITS = {
+  perUserPer10Min: 3,
+  perUserPerDay: 5,
+  perRecipientPerDay: 2,
+} as const;
+
+let rateTableReady: Promise<void> | null = null;
+async function ensureRateTable(): Promise<void> {
+  rateTableReady ??= (async () => {
+    const { runSchemaEnsure } = await import("@/lib/db/schema-ensure.server");
+    const { sql } = await import("@/lib/neon");
+    await runSchemaEnsure(async () => {
+      await sql`
+        create table if not exists public.forwarding_confirmation_sends (
+          id         bigint generated always as identity primary key,
+          user_id    uuid not null references public.profiles(id) on delete cascade,
+          recipient  text not null,
+          sent_at    timestamptz not null default now()
+        )
+      `;
+      await sql`
+        create index if not exists fwd_conf_sends_user_idx
+          on public.forwarding_confirmation_sends (user_id, sent_at)
+      `;
+      await sql`
+        create index if not exists fwd_conf_sends_recipient_idx
+          on public.forwarding_confirmation_sends (lower(recipient), sent_at)
+      `;
+    }, "forwarding.server.ts");
+  })().catch((error) => {
+    rateTableReady = null;
+    throw error;
+  });
+  return rateTableReady;
+}
+
+/**
+ * Controleert alle drie de grenzen en logt de verzending bij toestemming.
+ * Geeft `null` terug wanneer de mail verstuurd mag worden, anders de reden.
+ * Fail-closed: een databasefout blokkeert de verzending liever dan dat een
+ * limiet stilletjes verdwijnt.
+ */
+async function checkAndRecordSend(
+  userId: string,
+  recipient: string,
+): Promise<"rate_limited_user" | "rate_limited_recipient" | "unavailable" | null> {
+  try {
+    await ensureRateTable();
+    const { sql } = await import("@/lib/neon");
+
+    const counts = (await sql`
+      select
+        count(*) filter (where sent_at > now() - interval '10 minutes') as recent_user,
+        count(*) filter (where sent_at > now() - interval '1 day') as daily_user,
+        (select count(*) from public.forwarding_confirmation_sends
+          where lower(recipient) = ${recipient}
+            and sent_at > now() - interval '1 day') as daily_recipient
+      from public.forwarding_confirmation_sends
+      where user_id = ${userId}
+    `) as Record<string, unknown>[];
+    const row = counts[0] ?? {};
+
+    if (Number(row["recent_user"] ?? 0) >= RATE_LIMITS.perUserPer10Min)
+      return "rate_limited_user";
+    if (Number(row["daily_user"] ?? 0) >= RATE_LIMITS.perUserPerDay)
+      return "rate_limited_user";
+    if (Number(row["daily_recipient"] ?? 0) >= RATE_LIMITS.perRecipientPerDay)
+      return "rate_limited_recipient";
+
+    await sql`
+      insert into public.forwarding_confirmation_sends (user_id, recipient)
+      values (${userId}, ${recipient})
+    `;
+    return null;
+  } catch (error) {
+    console.error("[forwarding:rate-limit:failed]", error);
+    return "unavailable";
+  }
+}
+
 export async function requestForwardingConfirmation(
   userId: string,
   rawEmail: string,
@@ -84,6 +172,9 @@ export async function requestForwardingConfirmation(
 
   const { assertEntitled } = await import("./entitlement.server");
   await assertEntitled(userId); // throws NotEntitledError for free accounts
+
+  const limited = await checkAndRecordSend(userId, email);
+  if (limited) return { ok: false, sent: false, reason: limited };
 
   const { sql } = await import("@/lib/neon");
   const value = token();

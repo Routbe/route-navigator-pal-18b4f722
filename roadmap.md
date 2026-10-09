@@ -1,8 +1,17 @@
-# Roadmap (plan: Studio & trust overhaul)
-- [x] Fase 1: betrouwbaar opslaan (status, opnieuw proberen, geen race, waarschuwing bij verlaten)
-- [ ] Fase 2: concept + Publiceren (ongedaan maken + Ctrl+Z bestond al)
-- [ ] Fase 3: Primaire kanalen/volgers weg, verificatie in componentenlijst
-- [ ] Fase 4: groen/grijs vinkjes, herverificatie, adrescontrole (SMS-dienst nodig)
-- [ ] Fase 5: studio-stijlen — DONE: 104 kaders, zoeken, favorieten, populair; TODO: meer decoraties, statusbubbel, pro-knoppen, footer, FX, uitlijning
-- [ ] Fase 6: contactkaart meertalig + groot scherm
-- [ ] Fase 7: tests en controle
+# Roadmap
+
+## Migratie ROUT (rout.be)
+- [x] Code overnemen van GitHub en draaiend krijgen
+- [x] DATABASE_URL koppelen (Neon blijft database)
+- [x] Sessiesleutels genereren (BETTER_AUTH_SECRET, APP_SESSION_SECRET, SESSION_SECRET, MASTODON_STATE_SECRET)
+- [x] Inlogpagina verifiëren in preview
+- [ ] OAuth-providerkeys (Google/GitHub/...) en Brevo-mailsleutel vragen bij verificatie
+- [ ] Cronjobs en callback-URL's activeren na publicatie
+- [ ] Domein rout.be koppelen (cutover)
+
+## Beveiligingsrichtlijnen (gebruiker, 2026-10-09)
+- [x] Rate limits forwarding-bevestigingsmails: 3/10min + 5/dag per account, 2/dag per ontvanger
+      (db/55 + forwarding.server.ts, fail-closed)
+- [x] Dual-tier identiteit: root-handleclaim in profielinstellingen geblokkeerd voor gratis accounts
+      (writeProfileSettings); subdomeinen en donaties waren al afgeschermd via assertEntitled
+- [x] Donatie-/steunpagina: al server-side afgesloten voor gratis accounts (readDonationTarget → null)
