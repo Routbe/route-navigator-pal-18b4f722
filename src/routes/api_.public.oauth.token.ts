@@ -55,6 +55,8 @@ export const Route = createFileRoute("/api_/public/oauth/token")({
           return fail("invalid_request", "Verplichte velden ontbreken.");
         }
 
+        const { logOAuthEvent } = await import("@/lib/oauth/debug-events.server");
+        const detail = { redirectUri, hasPkce: Boolean(codeVerifier) };
         try {
           const { exchangeAuthorizationCode } = await import("@/lib/oauth/provider.server");
           const tokens = await exchangeAuthorizationCode({
@@ -69,11 +71,16 @@ export const Route = createFileRoute("/api_/public/oauth/token")({
               request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
               null,
           });
+          logOAuthEvent(clientId, "token", "success", null, detail);
           return Response.json(tokens, {
             headers: { ...cors, "cache-control": "no-store", pragma: "no-cache" },
           });
         } catch (error) {
           const anyError = error as { code?: string; message?: string };
+          logOAuthEvent(clientId, "token", "error", anyError.code ?? "invalid_grant", {
+            ...detail,
+            message: anyError.message,
+          });
           return fail(
             anyError.code ?? "invalid_grant",
             anyError.message ?? "De code kon niet ingewisseld worden.",

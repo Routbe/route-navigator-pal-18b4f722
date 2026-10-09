@@ -42,6 +42,20 @@ export const consoleAccess = createServerFn({ method: "GET" })
     return { verified: await isVerifiedDeveloper(context.userId) };
   });
 
+export const listOAuthDebugEvents = createServerFn({ method: "POST" })
+  .middleware([requireAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ id: z.string().uuid(), errorsOnly: z.boolean().optional() }).strict().parse(data),
+  )
+  .handler(async ({ data, context }) => {
+    await assertVerified(context.userId);
+    const { listClients } = await import("./provider.server");
+    const app = (await listClients(context.userId)).find((c) => c.id === data.id);
+    if (!app) throw new Error("Deze app bestaat niet (meer).");
+    const { listDebugEvents } = await import("./debug-events.server");
+    return listDebugEvents(app.clientId, Boolean(data.errorsOnly));
+  });
+
 export const listOAuthClients = createServerFn({ method: "GET" })
   .middleware([requireAuth])
   .handler(async ({ context }) => {
@@ -243,31 +257,43 @@ async function profileOf(userId: string) {
  */
 async function checkRequest(data: AuthorizeInput) {
   const { getClientByClientId, redirectAllowed, SUPPORTED_SCOPES } = await import("./provider.server");
+  const { logOAuthEvent } = await import("./debug-events.server");
+  const requested = (data.scope ?? "openid").split(" ").filter(Boolean);
+  const detail = {
+    redirectUri: data.redirectUri,
+    scopes: requested,
+    hasPkce: data.codeChallenge.length > 0,
+    pkceMethod: data.codeChallengeMethod ?? null,
+  };
+  const fail = (code: string, error: string) => {
+    logOAuthEvent(data.clientId, "authorize", "error", code, detail);
+    return { error } as const;
+  };
   const client = await getClientByClientId(data.clientId);
-  if (!client || client.status !== "active") return { error: "Deze app is onbekend bij ROUT." } as const;
+  if (!client || client.status !== "active") return fail("invalid_client", "Deze app is onbekend bij ROUT.");
   if (!redirectAllowed(client, data.redirectUri)) {
-    return { error: "Het terugkeeradres van deze app klopt niet." } as const;
+    return fail("invalid_redirect_uri", "Het terugkeeradres van deze app klopt niet.");
   }
   const hasPkce = data.codeChallenge.length > 0;
   if (hasPkce && (data.codeChallengeMethod !== "S256" || data.codeChallenge.length < 43)) {
-    return { error: "Deze app moet PKCE met S256 gebruiken." } as const;
+    return fail("invalid_pkce_method", "Deze app moet PKCE met S256 gebruiken.");
   }
   if (!hasPkce && (client.requirePkce || !client.hasSecret)) {
-    return { error: "Deze app moet PKCE (S256) meesturen." } as const;
+    return fail("missing_code_challenge", "Deze app moet PKCE (S256) meesturen.");
   }
-  const requested = (data.scope ?? "openid").split(" ").filter(Boolean);
   const scopes = requested.filter(
     (s) => client.scopes.includes(s) && SUPPORTED_SCOPES.includes(s as never),
   );
   if (!scopes.includes("openid")) scopes.unshift("openid");
   const unknown = requested.find((s) => !scopes.includes(s));
-  if (unknown) return { error: `Deze app vraagt een recht dat niet mag: ${unknown}.` } as const;
+  if (unknown) return fail("invalid_scope", `Deze app vraagt een recht dat niet mag: ${unknown}.`);
   const stepUp = needsStepUp({
     flowPreference: client.flowPreference,
     prompt: data.prompt ?? null,
     maxAge: data.maxAge ?? null,
     acrValues: data.acrValues ?? null,
   });
+  logOAuthEvent(data.clientId, "authorize", "success", null, detail);
   return { client, scopes, stepUp } as const;
 }
 
